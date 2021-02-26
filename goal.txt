@@ -1,0 +1,9 @@
+machine learning:
+---> web server --> socket.io to chat in real time
+  + Node.JS
+  + Express
+  + socket.io
+---> Create a robot using machine learning (using APIs perhaps)
+
+Note:
+ 1. update image

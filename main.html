@@ -1,0 +1,153 @@
+<html>
+<style>
+  body {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0 20px;
+  }
+
+  .container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+  }
+
+  .text{
+    text-align: right;
+    font-weight: bold;
+  }
+  .darker {
+    border-color: #ccc;
+    background-color: #ddd;
+  }
+
+  .container::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+  }
+
+  .container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+  }
+
+  .time-right {
+    float: right;
+    color: #aaa;
+  }
+
+  .time-left {
+    float: left;
+    color: #999;
+  }
+  .table{
+    background-color: DeepSkyBlue;
+    color: white;
+    border: 2px solid black;
+    margin: 5px;
+    padding: 5px;
+  }
+</style>
+  <head>
+    <title>
+      chat room
+    </title>
+  </head>
+  <body>
+
+    <p id = "numberOfClients"> Number of clients </p>
+    <input id="name">
+    <button id = "Submit" onclick = registeration()>Submit</button>
+  </body>
+    <script src="https://cdn.socket.io/3.1.1/socket.io.min.js" integrity="sha384-gDaozqUvc4HTgo8iZjwth73C6dDDeOJsAgpxBcMpZYztUfjHXpzrpdrHRdVp8ySO" crossorigin="anonymous"></script>
+    <script src = "myscript.js"></script>
+    <script>
+      document.getElementById('name').addEventListener("keyup", (e)=>{
+      if (e.keyCode == 13){
+       document.getElementById("Submit").click()
+      }})
+      var socket = io()
+      var user
+      var clients = 0
+      var current = new Date()
+      // registration function
+      function registeration(){
+        var clientName = document.getElementById('name').value
+        if(clientName){
+          if(clientName.length >= 4)
+            socket.emit('setUserName', document.getElementById('name').value)
+          else
+          alert("Your name should have at least 4 characters")
+        }
+        else{
+            alert("Please enter your name to join room chat")
+        }
+      }
+      // After succesfully registered then redirect
+      socket.on("UserSetUpComplete",(data) =>{
+        user = data.username
+        clients = data.list
+        number = clients.length
+        document.body.innerHTML = '<p id = "numberOfClients"> Number of clients ' + number + '</p>\
+        <div class = "table" id = clients></div>\
+        <p>you are logged as <b>' + user +'</b><p>\
+        <input id="input" autocomplete="off">\
+        <div id="messages"></div>\
+        <button id = "Send" onclick = setMessage()> Send</button>'
+        document.body.innerHTML += data.dest
+        for (x in clients){
+          document.getElementById('clients').innerHTML += '<p style = "color: white">' +clients[x][0]+'</p>'
+        }
+        document.getElementById('input').addEventListener("keyup", (e)=>{
+        if (e.keyCode == 13){
+          document.getElementById("Send").click()
+        }})
+      })
+      // updating number of clients
+      socket.on('clients', (data)=>{
+        number = data.data
+        clients = data.list
+        document.getElementById('numberOfClients').innerHTML = "Number of clients " + number
+        if (user){
+          document.getElementById('clients').innerHTML = ""
+          console.log(clients)
+          for (x in clients){
+            document.getElementById('clients').innerHTML += '<p style = "color: white">' +clients[x][0]+'</p>'
+          }
+        }
+      })
+      // send message to people
+      function setMessage(){
+        var msg = document.getElementById('input').value
+        if(msg){
+          document.getElementById('input').value = ""
+          socket.emit('msg',{message: msg, user: user})
+        }}
+        socket.on('newmsg',function(data){
+          if(user){
+            if (user == data.user) {
+              document.getElementById('messages').innerHTML += '<div class = "container"><p class = "text">' + data.user +'</b><p style = "text-align: right">' + data.message +
+              '</p>\
+              <span class = "time-right" >' +current.toLocaleTimeString() +'</span></div>'
+            }
+            else{
+              document.getElementById('messages').innerHTML += '<div class = "container darker"><b>' + data.user +'</b><p>' + data.message +
+              '</p>\
+              <span class = "time-left">' +current.toLocaleTimeString() +'</span></div>'
+            }
+
+          }})
+      </script>
+</html>
