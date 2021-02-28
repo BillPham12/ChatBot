@@ -1,5 +1,6 @@
 # Coded by METACHAR
 # Looking to work with other hit me up on my email @metachar1@gmail.com <--
+# modifying by Bill Pham
 import sys
 import datetime
 import selenium
@@ -15,12 +16,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver import ActionChains
+import json
 
-
-optionss = webdriver.ChromeOptions()
-optionss.add_argument("--disable-popup-blocking")
-optionss.add_argument("--disable-extensions")
-driver = webdriver.Chrome(ChromeDriverManager().install())
+#optionss = webdriver.ChromeOptions()
+#optionss.add_argument("--disable-popup-blocking")
+#optionss.add_argument("--disable-extensions")
+#driver = webdriver.Chrome(ChromeDriverManager().install())
 def site_login(url,account,password):
     print("Trying password", passw, "current target is ",target, "on url", url)
     driver.get(url)
